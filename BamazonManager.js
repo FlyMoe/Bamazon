@@ -1,4 +1,3 @@
-
 var mysql = require("mysql");
 var inquirer = require('inquirer');
 
@@ -6,8 +5,7 @@ var con = mysql.createConnection({
    host: "localhost",
    user: "root",
    password: "family99",
-   database: "topsongsdb"
-
+   database: "bamazon_db"
 });
 
 con.connect(function(err) {
@@ -15,10 +13,10 @@ con.connect(function(err) {
        console.log('Error connecting to Db');
        return;
    }
-   runSearch();
+   runManager();
 });
 
-var runSearch = function() {
+var runManager = function() {
     inquirer.prompt({
         name: "action",
         type: "list",
@@ -44,3 +42,54 @@ var runSearch = function() {
         }
     })
 };
+
+
+// Function which returns all data for products
+var productsForSale = function(){
+ 	con.query('SELECT * FROM products', function(err, results) {
+		if (err) throw err;
+		if (results == "") {
+		  console.log("No Products in the database!");
+		} else {
+		  for (var i = 0; i < results.length; i++) {
+		    console.log("ItemID: " + results[i].itemID + " || Product Name: " + results[i].productName + " || Price: " + results[i].price + 
+		    			" || Quantity: " + results[i].stockQuantity);
+		  }
+		}
+		runManager();
+    });
+}
+
+// Function which returns inventory lower than 5
+var lowInventory = function(){
+ 	con.query('SELECT * FROM products where stockQuantity < 5', function(err, results) {
+		if (err) throw err;
+		if (results == "") {
+		  console.log("No Products in the database with less than 5 items in stock!");
+		} else {
+		  console.log("These items have less than 5 items in stock:");
+		  for (var i = 0; i < results.length; i++) {
+		    console.log("ItemID: " + results[i].itemID + " || Product Name: " + results[i].productName + " || Price: " + results[i].price + 
+		    			" || Quantity: " + results[i].stockQuantity);
+		  }
+		}
+		runManager();
+    });
+}
+
+// Function which let's the manager add more items to the inventory
+var addToInventory = function(){
+ 	con.query('SELECT * FROM products where stockQuantity < 5', function(err, results) {
+		if (err) throw err;
+		if (results == "") {
+		  console.log("No Products in the database with less than 5 items in stock!");
+		} else {
+		  console.log("These items have less than 5 items in stock:");
+		  for (var i = 0; i < results.length; i++) {
+		    console.log("ItemID: " + results[i].itemID + " || Product Name: " + results[i].productName + " || Price: " + results[i].price + 
+		    			" || Quantity: " + results[i].stockQuantity);
+		  }
+		}
+		runManager();
+    });
+}

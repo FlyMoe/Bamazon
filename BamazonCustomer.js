@@ -6,7 +6,6 @@ var con = mysql.createConnection({
    user: "root",
    password: "family99",
    database: "bamazon_db"
-
 });
 
 con.query('SELECT ItemID, ProductName, Price FROM products', function(err, result) {
