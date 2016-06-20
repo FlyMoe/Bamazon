@@ -43,7 +43,7 @@ var runManager = function() {
     })
 };
 
-
+// Option #1
 // Function which returns all data for products
 var productsForSale = function(){
  	con.query('SELECT * FROM products', function(err, results) {
@@ -60,6 +60,7 @@ var productsForSale = function(){
     });
 }
 
+// Option #2
 // Function which returns inventory lower than 5
 var lowInventory = function(){
  	con.query('SELECT * FROM products where stockQuantity < 5', function(err, results) {
@@ -77,19 +78,57 @@ var lowInventory = function(){
     });
 }
 
+// Option #3
 // Function which let's the manager add more items to the inventory
 var addToInventory = function(){
- 	con.query('SELECT * FROM products where stockQuantity < 5', function(err, results) {
-		if (err) throw err;
-		if (results == "") {
-		  console.log("No Products in the database with less than 5 items in stock!");
-		} else {
-		  console.log("These items have less than 5 items in stock:");
-		  for (var i = 0; i < results.length; i++) {
-		    console.log("ItemID: " + results[i].itemID + " || Product Name: " + results[i].productName + " || Price: " + results[i].price + 
-		    			" || Quantity: " + results[i].stockQuantity);
-		  }
-		}
-		runManager();
-    });
+ 	inquirer.prompt([{
+     type: 'input',
+     message: 'what product id do you want to add more inventory?',
+     name: 'productID'
+  },{
+  	 type: 'input',
+     message: 'Quantity of product to add?',
+     name: 'productQuantity'
+  }]).then(function(item) {
+  	 var post = { itemID: item.productID }
+  	 con.query('SELECT stockQuantity from products WHERE?', post, function(err, results) {
+     	if (err) throw err;
+     	var quantity = (Number(results[0].stockQuantity) + Number(item.productQuantity));
+        con.query('UPDATE products SET stockQuantity = ? WHERE itemID = ?', [quantity, item.productID], function(err, results) {
+	        if (err) throw err;
+	        console.log("The quantity was added to the product.");	  
+	        runManager();       
+        });         
+     });
+  })
+}
+
+// Option #4
+// Function which let's the manager add more items to the inventory
+var addNewProduct = function(){
+ 	inquirer.prompt([{
+     type: 'input',
+     message: 'Name of the product?',
+     name: 'productName'
+  },{
+     type: 'input',
+     message: 'Department Name?',
+     name: 'departmentName'
+  },{
+     type: 'input',
+     message: 'Product Price?',
+     name: 'productPrice'
+  },{
+     type: 'input',
+     message: 'Product Quantity?',
+     name: 'productQuantity'
+  }]).then(function(item) {
+     var post = { productName: item.productName, departmentName: item.departmentName, price: item.productPrice, 
+     			stockQuantity: item.productQuantity}
+     con.query('INSERT INTO products SET?', post, function(err, results) {
+        if (err) throw err;         
+       	console.log("Product information was inserted.");           
+     });
+     runManager();
+  })
 }
